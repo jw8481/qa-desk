@@ -101,6 +101,8 @@ body.dark .head .links .lg+.lg{border-left:2px solid #8a96a8}
 .dlgRow{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .dlgRow button{border:0;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
 body.dark .dlg{background:#1c2027;color:#e6e8eb}
+.lhint{font-weight:400;font-size:11px;color:#667085;margin-left:6px}
+body.dark .lhint{color:#9aa4b2}
 .resetWrap{position:relative;display:inline-block}
 .tooltip{position:absolute;bottom:calc(100% + 8px);right:0;background:#202124;color:#fff;font-size:11px;line-height:1.4;padding:8px 10px;border-radius:8px;white-space:nowrap;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px #0003;z-index:5}
 .tooltip[hidden]{display:none}
@@ -139,7 +141,7 @@ body.dark .dlg{background:#1c2027;color:#e6e8eb}
 <section class="card">
 <h2>③ 본문 작성</h2>
 <div class="group"><label>[상세설명]</label><textarea id="b1" data-h="[상세설명]" placeholder="예: [통합앱][iOS] 상품 UI가 노출하지 않음 (Android, iOS 모두 발생)"></textarea></div>
-<div class="group"><label>[사전조건]</label><textarea id="b2" data-h="[사전조건]" placeholder="예: 상품번호 1000012345678"></textarea></div>
+<div class="group"><label>[사전조건] <span class="lhint">비워두면 미리보기와 복사에서 빠져요</span></label><textarea id="b2" data-h="[사전조건]" placeholder="예: 상품번호 1000012345678"></textarea></div>
 <div class="group"><label>[재현경로]</label><textarea id="b3" class="tall" data-h="[재현경로]" placeholder="1. SSG몰 > 홈매장 > ...&#10;https://...&#10;2. 유닛명 > ...&#10;3. 확인 내용"></textarea></div>
 <div class="group" style="margin-top:8px"><div class="addRow"><input id="urlHelper" placeholder="URL 도우미: 주소를 붙여넣고 버튼을 누르세요"><button type="button" class="secondary" id="urlHelperBtn">URL 추가</button></div></div>
 <div class="group"><label>[기대결과]</label><textarea id="b4" data-h="[기대결과]" placeholder="상품 UI 가 정상 노출할 것"></textarea></div>
@@ -228,24 +230,24 @@ body.dark .dlg{background:#1c2027;color:#e6e8eb}
    url 의 따옴표 안에 주소를 넣으면 버튼이 활성화됩니다. 예) url:"https://..."
    action 이 있는 버튼(내보내기, 다크모드)은 기능 버튼이라 주소를 넣지 않습니다. */
 const LINKS=[
- {group:"담당자",label:"앱개발 담당자",url:""},
- {group:"담당자",label:"웹 담당자",url:""},
- {group:"담당자",label:"기획 담당자",url:""},
- {group:"참고 자료",label:"이슈 작성 가이드",url:""},
- {group:"참고 자료",label:"테스트 계정/서버 정보",url:""},
- {group:"참고 자료",label:"릴리즈 일정",url:""},
- {group:"도구",label:"파일로 내보내기",action:"export"},
- {group:"도구",label:"다크모드",action:"theme"},
- {group:"Jira",label:"+이슈 등록",url:""},
- {group:"Jira",label:"우리팀 등록 이슈",url:""},
- {group:"Jira",label:"내가 올린 이슈",url:""}
+ {group:"담당자",icon:"📱",label:"앱개발 담당자",url:""},
+ {group:"담당자",icon:"🌐",label:"웹 담당자",url:""},
+ {group:"담당자",icon:"📝",label:"기획 담당자",url:""},
+ {group:"참고 자료",icon:"📖",label:"이슈 작성 가이드",url:""},
+ {group:"참고 자료",icon:"🔑",label:"테스트 계정/서버 정보",url:""},
+ {group:"참고 자료",icon:"📅",label:"릴리즈 일정",url:""},
+ {group:"도구",icon:"💾",label:"파일로 내보내기",action:"export"},
+ {group:"도구",icon:"🌙",label:"다크",action:"theme"},
+ {group:"Jira",icon:"✚",label:"이슈 등록",url:""},
+ {group:"Jira",icon:"👥",label:"우리팀 등록 이슈",url:""},
+ {group:"Jira",icon:"🙋",label:"내가 올린 이슈",url:""}
 ];
 const toastEl=document.getElementById("toast");let toastTimer;
 function showToast(m){toastEl.textContent=m;toastEl.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove("show"),1800);}
 
 /* 다크모드 / 라이트모드 */
 let themeBtn=null;
-function applyTheme(dark){document.body.classList.toggle("dark",dark);if(themeBtn)themeBtn.textContent=dark?"라이트모드":"다크모드";try{localStorage.setItem("qaToolkitDark",dark?"1":"0");}catch(e){}}
+function applyTheme(dark){document.body.classList.toggle("dark",dark);if(themeBtn)themeBtn.textContent=dark?"☀️ 라이트":"🌙 다크";try{localStorage.setItem("qaToolkitDark",dark?"1":"0");}catch(e){}}
 function toggleTheme(){applyTheme(!document.body.classList.contains("dark"));}
 
 /* 파일로 내보내기: 내가 설정한 것(기기 목록, 다크모드)만 파일로 저장 */
@@ -262,13 +264,14 @@ function exportFile(){
     const box=document.createElement("div");box.className="lg";
     const t=document.createElement("span");t.className="t";t.textContent=g;box.appendChild(t);
     LINKS.filter(l=>l.group===g).forEach(l=>{
+      const lab=(l.icon?l.icon+" ":"")+l.label;
       if(l.action){
-        const b=document.createElement("button");b.type="button";b.className="lk on";b.textContent=l.label;
+        const b=document.createElement("button");b.type="button";b.className="lk on";b.textContent=lab;
         if(l.action==="export")b.addEventListener("click",exportFile);
         if(l.action==="theme"){themeBtn=b;b.addEventListener("click",toggleTheme);}
         box.appendChild(b);
-      }else if(l.url){const a=document.createElement("a");a.className="lk on";a.href=l.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=l.label;box.appendChild(a);}
-      else{const b=document.createElement("button");b.type="button";b.className="lk";b.textContent=l.label;b.title="아직 연결되지 않았어요";b.addEventListener("click",()=>showToast("「"+l.label+"」은(는) 아직 연결되지 않았어요."));box.appendChild(b);}
+      }else if(l.url){const a=document.createElement("a");a.className="lk on";a.href=l.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=lab;box.appendChild(a);}
+      else{const b=document.createElement("button");b.type="button";b.className="lk";b.textContent=lab;b.title="아직 연결되지 않았어요";b.addEventListener("click",()=>showToast("「"+l.label+"」은(는) 아직 연결되지 않았어요."));box.appendChild(b);}
     });
     return box;
   }
@@ -310,7 +313,12 @@ function drawScope(){const vals=scopeValues();if(!vals.includes(selectedScope))s
 function drawAll(){drawCategory();drawPlatform();drawScope();drawDevices();render();}
 function getTitle(){return `[${selectedCategory}][${selectedPlatform}] ${issue.value.trim()||"이슈 제목"} (${selectedScope})`;}
 function cleanVal(v){return v.split("\n").filter(l=>!/^\s*(\d+\.|-)\s*$/.test(l)).join("\n").trim();}
-function getBody(){return bodyBoxes.map(b=>b.dataset.h+"\n"+cleanVal(b.value)).join("\n\n");}
+/* 본문 조각 만들기: [사전조건]은 비어 있으면 통째로 빠집니다 */
+function getBodyParts(){return bodyBoxes.filter(b=>b.dataset.h!=="[사전조건]"||cleanVal(b.value)).map(b=>({h:b.dataset.h,v:cleanVal(b.value)}));}
+function getBody(){return getBodyParts().map(x=>x.h+"\n"+x.v).join("\n\n");}
+const escHtml=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const linesHtml=v=>escHtml(v).split("\n").map(l=>l.replace(/^( +)/,m=>"&nbsp;".repeat(m.length))).join("<br>");
+function getBodyHtml(){return getBodyParts().map(x=>"<b>"+escHtml(x.h)+"</b><br>"+linesHtml(x.v)).join("<br><br>");}
 function getNotice(){
   if(selectedCategory==="통합앱"&&(selectedPlatform==="Android"||selectedPlatform==="iOS")&&selectedScope==="Android, iOS 모두 발생")
     return "Android, iOS 둘 다 발생하면 각각 별도 이슈로 등록해야 해요.";
@@ -322,7 +330,7 @@ function getNotice(){
 }
 function render(){
   scheduleSave();
-  const n=getNotice(),box=document.getElementById("scopeNotice");box.textContent=n?"⚠ "+n:"";box.hidden=!n;document.getElementById("summaryPreview").textContent=getTitle();document.getElementById("bodyPreview").textContent=getBody();}
+  const n=getNotice(),box=document.getElementById("scopeNotice");box.textContent=n?"⚠ "+n:"";box.hidden=!n;document.getElementById("summaryPreview").textContent=getTitle();document.getElementById("bodyPreview").innerHTML=getBodyHtml();}
 function legacyCopy(text){const t=document.createElement("textarea");t.value=text;t.style.cssText="position:fixed;opacity:0";document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand("copy");}catch(e){}t.remove();return ok;}
 async function copyText(text,box,okMsg){let ok=false;try{await navigator.clipboard.writeText(text);ok=true;}catch(e){ok=legacyCopy(text);}box.style.color=ok?"#1f9d55":"#e5484d";box.textContent=ok?okMsg:"자동 복사가 차단되었습니다. 직접 선택해 Ctrl+C로 복사해 주세요.";}
 /* 파일 저장: 게시된 페이지에서는 Claude의 저장 기능, 일반 파일로 열었을 땐 브라우저 다운로드 */
@@ -354,12 +362,22 @@ function askDialog(msg,withInput,def){
     (inp||ok).focus();
   });
 }
+async function copyRich(html,text){
+  try{if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){await navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([text],{type:"text/plain"})})]);return "rich";}}catch(e){}
+  try{const d=document.createElement("div");d.innerHTML=html;d.style.cssText="position:fixed;left:-9999px;top:0;white-space:pre-wrap";document.body.appendChild(d);const r=document.createRange();r.selectNodeContents(d);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);const ok=document.execCommand("copy");sel.removeAllRanges();d.remove();if(ok)return "rich";}catch(e){}
+  try{await navigator.clipboard.writeText(text);return "plain";}catch(e){}
+  return legacyCopy(text)?"plain":"fail";
+}
 const askConfirm=m=>askDialog(m,false);
 const askText=(m,d)=>askDialog(m,true,d);
 issue.addEventListener("input",render);
 bodyBoxes.forEach(b=>b.addEventListener("input",render));
 document.getElementById("copySummary").addEventListener("click",()=>copyText(getTitle(),statusSummary,"서머리를 복사했습니다. Jira에서 Ctrl+V로 붙여넣으세요."));
-document.getElementById("copyBody").addEventListener("click",()=>copyText(getBody(),statusBody,"본문을 복사했습니다. Jira 설명란에 Ctrl+V로 붙여넣으세요."));
+document.getElementById("copyBody").addEventListener("click",async()=>{
+  const r=await copyRich(getBodyHtml(),getBody());
+  statusBody.style.color=r==="fail"?"#e5484d":"#1f9d55";
+  statusBody.textContent=r==="rich"?"본문을 복사했습니다. [제목]은 굵게 붙여넣어져요. Jira 설명란에 Ctrl+V로 붙여넣으세요.":r==="plain"?"본문을 복사했습니다. (굵은 글씨 없이 일반 글자로 복사됐어요)":"자동 복사가 차단되었습니다. 직접 선택해 Ctrl+C로 복사해 주세요.";
+});
 const resetTip=document.getElementById("resetTip");
 document.getElementById("reset").addEventListener("click",e=>{e.stopPropagation();resetTip.hidden=!resetTip.hidden;});
 document.getElementById("resetNo").addEventListener("click",()=>{resetTip.hidden=true;});
@@ -414,6 +432,7 @@ function setupAuto(box,mode){
     }
   });
 }
+setupAuto(document.getElementById("b2"),"num");
 setupAuto(document.getElementById("b3"),"num");
 setupAuto(document.getElementById("b5"),"dash");
 
