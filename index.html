@@ -93,7 +93,7 @@ body.dark .head .links{background:none;border:0}
 .head .links .lg+.lg{border-left:1px solid #c3cbd6;padding-left:16px}
 .head .links .lk{white-space:nowrap;padding:5px 8px}
 body.dark .head .links .lg+.lg{border-left:2px solid #8a96a8}
-@media(max-width:1200px){.head{flex-wrap:wrap}.head .links{flex-wrap:wrap;justify-content:flex-start;gap:8px 16px}.head .links .lg{flex-wrap:wrap}}
+@media(max-width:700px){.head .links .lg{flex-wrap:wrap}}
 .dlgOv{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .dlg{background:#fff;color:#202124;border-radius:12px;padding:18px;width:min(380px,100%);box-shadow:0 8px 28px #0004}
 .dlgMsg{font-size:14px;font-weight:700;margin-bottom:12px;line-height:1.5}
@@ -103,6 +103,16 @@ body.dark .head .links .lg+.lg{border-left:2px solid #8a96a8}
 body.dark .dlg{background:#1c2027;color:#e6e8eb}
 .lhint{font-weight:400;font-size:11px;color:#667085;margin-left:6px}
 body.dark .lhint{color:#9aa4b2}
+/* 맨 위 제목줄 고정: 링크가 한 줄일 때만 (JS가 body에 headFix 표시) */
+.head{flex-wrap:wrap;margin-bottom:14px}
+.head .links{flex-wrap:wrap;justify-content:flex-start;gap:6px 16px}
+.tabs{top:var(--hh,0px)}
+.right{top:calc(var(--hh,0px) + 56px)}
+.tabs{padding-top:0;margin-bottom:0}
+#tab-reg,#tab-chk{padding-top:14px}
+body.headFix .head{position:sticky;top:0;z-index:30;background:#f3f5f8;padding:2px 0;margin-bottom:14px}
+body.headFix .head h1{font-size:20px}
+body.dark.headFix .head{background:#14171c}
 .resetWrap{position:relative;display:inline-block}
 .tooltip{position:absolute;bottom:calc(100% + 8px);right:0;background:#202124;color:#fff;font-size:11px;line-height:1.4;padding:8px 10px;border-radius:8px;white-space:nowrap;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px #0003;z-index:5}
 .tooltip[hidden]{display:none}
@@ -705,6 +715,18 @@ buildChkEnv();
   let tab="reg";try{tab=localStorage.getItem("qaToolkitTab")||"reg";}catch(e){}
   showTab(tab==="chk"?"chk":"reg");
 })();
+
+/* ===== 맨 위 고정: 링크가 한 줄이면 제목줄+탭 모두 고정, 두 줄 이상이면 탭만 고정 ===== */
+function updateSticky(){
+  const head=document.querySelector(".head"),txt=document.querySelector(".headText");
+  document.body.classList.remove("headFix");
+  const multi=head.offsetHeight>txt.offsetHeight+10;
+  document.body.classList.toggle("headFix",!multi);
+  document.documentElement.style.setProperty("--hh",(multi?0:head.offsetHeight)+"px");
+}
+window.addEventListener("resize",updateSticky);
+window.addEventListener("load",updateSticky);
+updateSticky();
 
 drawAll();
 </script>
